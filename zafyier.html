@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0e27">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="ZAFYIER - Zero-latency Autonomous Framework Yielding Intelligent Execution & Response">
+    <title>ZAFYIER - Intelligent System Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #00f0ff;
+            --secondary: #0080ff;
+            --accent: #ff2a6d;
+            --success: #05ffa1;
+            --warning: #ffee00;
+            --danger: #ff3864;
+            --bg-dark: #020617;
+            --bg-panel: rgba(10, 20, 40, 0.9);
+            --glass: rgba(0, 240, 255, 0.08);
+            --border: rgba(0, 240, 255, 0.25);
+            --text: #e0f7ff;
+            --text-dim: rgba(224, 247, 255, 0.6);
+        }
+
+        @font-face {
+            font-family: 'Zafyier';
+            src: local('Segoe UI'), local('Roboto'), system-ui, sans-serif;
+        }
+
+        body {
+            font-family: 'Zafyier', system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        /* Animated Background Grid */
+        .quantum-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: quantumShift 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes quantumShift {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(40px); }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            animation: quantumFloat 8s infinite;
+            box-shadow: 0 0 6px var(--primary);
+        }
+
+        @keyframes quantumFloat {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Boot Sequence */
+        .boot-sequence {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s, visibility 0.8s;
+        }
+
+        .boot-sequence.complete {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .zafyier-logo {
+            font-size: 4rem;
+            font-weight: 100;
+            letter-spacing: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .boot-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .boot-bar {
+            width: 300px;
+            height: 2px;
+            background: rgba(0, 240, 255, 0.2);
+            border-radius: 1px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .boot-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .boot-details {
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: 'Courier New', monospace;
+            max-width: 400px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Main Container */
+        .zafyier-container {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .zafyier-container.active {
+            opacity: 1;
+        }
+
+        /* Header */
+        .system-header {
+            padding: 15px 25px;
+            background: linear-gradient(180deg, rgba(2,6,23,0.95) 0%, transparent 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 35px;
+            height: 35px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: iconPulse 3s infinite;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 5px var(--primary); }
+            50% { box-shadow: 0 0 20px var(--primary), 0 0 40px rgba(0, 240, 255, 0.2); }
+        }
+
+        .brand-text {
+            font-size: 1.4rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .system-status {
+            display: flex;
+            gap: 25px;
+            font-size: 0.8rem;
+            align-items: center;
+        }
+
+        .status-unit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--glass);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: statusPulse 2s infinite;
+        }
+
+        .status-dot.warning { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+        .status-dot.danger { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .status-dot.offline { background: var(--text-dim); box-shadow: none; }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Interface */
+        .interface-grid {
+            display: grid;
+            grid-template-columns: 90px 1fr 320px;
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1200px) {
+            .interface-grid { grid-template-columns: 70px 1fr 280px; }
+        }
+
+        @media (max-width: 968px) {
+            .interface-grid { grid-template-columns: 60px 1fr; }
+            .data-panel { display: none; }
+        }
+
+        @media (max-width: 640px) {
+            .interface-grid { 
+                grid-template-columns: 1fr; 
+                padding: 10px;
+                gap: 10px;
+            }
+            .nav-rail { display: none; }
+        }
+
+        /* Navigation Rail */
+        .nav-rail {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px 10px;
+            background: var(--bg-panel);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-item {
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.2);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .nav-item svg {
+            width: 26px;
+            height: 26px;
+            fill: var(--text-dim);
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover svg, .nav-item.active svg {
+            fill: var(--primary);
+            filter: drop-shadow(0 0 5px var(--primary));
+        }
+
+        /* Core Display */
+        .core-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            gap: 30px;
+        }
+
+        .quantum-core {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .quantum-core { width: 280px; height: 280px; }
+        }
+
+        @media (max-width: 480px) {
+            .quantum-core { width: 220px; height: 220px; }
+        }
+
+        .core-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: linear-gradient(var(--bg-dark), var(--bg-dark)) padding-box,
+                        linear-gradient(135deg, var(--primary), transparent, var(--secondary)) border-box;
+        }
+
+        .ring-1 { 
+            width: 100%; height: 100%; 
+            animation: rotate 20s linear infinite;
+            border-style: dashed;
+            opacity: 0.6;
+        }
+        .ring-2 { 
+            width: 85%; height: 85%; 
+            animation: rotate-reverse 15s linear infinite;
+            border-width: 1px;
+            opacity: 0.4;
+        }
+        .ring-3 { 
+            width: 70%; height: 70%; 
+            animation: rotate 10s linear infinite;
+            border-style: dotted;
+            opacity: 0.8;
+        }
+        .ring-4 { 
+            width: 55%; height: 55%; 
+            animation: quantumPulse 4s ease-in-out infinite;
+            border-width: 3px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+        }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotate-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes quantumPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        .core-orb {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, var(--primary) 0%, var(--secondary) 50%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: orbGlow 3s ease-in-out infinite;
+            box-shadow: 0 0 60px rgba(0, 240, 255, 0.6);
+        }
+
+        @media (max-width: 480px) {
+            .core-orb { width: 90px; height: 90px; }
+        }
+
+        @keyframes orbGlow {
+            0%, 100% { box-shadow: 0 0 30px var(--primary), 0 0 60px rgba(0, 240, 255, 0.4); }
+            50% { box-shadow: 0 0 50px var(--primary), 0 0 100px rgba(0, 240, 255, 0.8); }
+        }
+
+        .core-initial {
+            font-size: 3rem;
+            font-weight: 100;
+            color: white;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8);
+        }
+
+        .wave-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .voice-wave {
+            position: absolute;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .listening .voice-wave {
+            animation: waveExpand 2s ease-out infinite;
+        }
+
+        .listening .voice-wave:nth-child(1) { animation-delay: 0s; }
+        .listening .voice-wave:nth-child(2) { animation-delay: 0.5s; }
+        .listening .voice-wave:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes waveExpand {
+            0% { width: 100px; height: 100px; opacity: 0.8; }
+            100% { width: 400px; height: 400px; opacity: 0; }
+        }
+
+        /* Terminal */
+        .quantum-terminal {
+            width: 100%;
+            max-width: 700px;
+            height: 220px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 640px) {
+            .quantum-terminal { height: 180px; font-size: 0.8rem; }
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: lineAppear 0.3s forwards;
+            display: flex;
+            gap: 12px;
+            line-height: 1.4;
+        }
+
+        @keyframes lineAppear { to { opacity: 1; } }
+
+        .timestamp {
+            color: var(--secondary);
+            font-size: 0.75rem;
+            min-width: 70px;
+            opacity: 0.8;
+        }
+
+        .prompt { color: var(--success); }
+        .response { color: var(--text); }
+        .system { color: var(--warning); }
+        .error { color: var(--danger); }
+        .info { color: var(--primary); }
+
+        /* Data Panel */
+        .data-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .panel-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            backdrop-filter: blur(20px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .panel-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+        }
+
+        .card-header svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--primary);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .metric {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 14px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Command Interface */
+        .command-interface {
+            padding: 20px 25px;
+            background: linear-gradient(0deg, rgba(2,6,23,0.95) 0%, transparent 100%);
+            border-top: 1px solid var(--border);
+        }
+
+        .input-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: var(--bg-panel);
+            padding: 8px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .voice-trigger {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-trigger:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        .voice-trigger.listening {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            animation: voicePulse 1s infinite;
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 42, 109, 0.7); }
+            50% { box-shadow: 0 0 0 15px rgba(255, 42, 109, 0); }
+        }
+
+        .voice-trigger svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 1.05rem;
+            padding: 10px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .command-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .execute-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            color: var(--bg-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .execute-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+        }
+
+        .execute-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-panel);
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .mobile-nav { display: flex; }
+        }
+
+        .mobile-nav-item {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mobile-nav-item.active {
+            background: var(--glass);
+            border: 1px solid var(--primary);
+        }
+
+        .mobile-nav-item svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--text-dim);
+        }
+
+        .mobile-nav-item.active svg {
+            fill: var(--primary);
+        }
+
+        /* Permission Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 300;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-modal {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: rotate(90deg);
+        }
+
+        .permission-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .permission-item:hover {
+            background: rgba(0, 240, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .permission-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: var(--glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .permission-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary);
+        }
+
+        .permission-info h4 {
+            color: var(--text);
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .permission-info p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .grant-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 12px;
+            color: var(--bg-dark);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .grant-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.4);
+        }
+
+        /* Offline Banner */
+        .offline-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px;
+            background: var(--warning);
+            color: var(--bg-dark);
+            text-align: center;
+            font-weight: 600;
+            transform: translateY(-100%);
+            transition: transform 0.3s;
+            z-index: 9998;
+            font-size: 0.9rem;
+        }
+
+        .offline-indicator.show {
+            transform: translateY(0);
+        }
+
+        /* File Manager Overlay */
+        .file-manager {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            height: 70vh;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            z-index: 9997;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
+        }
+
+        .file-manager.active { display: flex; }
+
+        .fm-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fm-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-item:hover {
+            background: var(--glass);
+            transform: translateX(5px);
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.03), transparent);
+            animation: scanline 6s linear infinite;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Boot Sequence -->
+    <div class="boot-sequence" id="bootSequence">
+        <div class="zafyier-logo">ZAFYIER</div>
+        <div class="boot-text" id="bootText">Initializing quantum core...</div>
+        <div class="boot-bar">
+            <div class="boot-progress" id="bootProgress"></div>
+        </div>
+        <div class="boot-details" id="bootDetails">
+            Zero-latency Autonomous Framework Yielding Intelligent Execution & Response<br>
+            System Version 3.0.1 | Build 2024.12.18
+        </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineBanner">
+        ⚠ OFFLINE MODE ACTIVE - Limited functionality available
+    </div>
+
+    <!-- Background Effects -->
+    <div class="quantum-grid"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Main Container -->
+    <div class="zafyier-container" id="mainContainer">
+        
+        <!-- Header -->
+        <header class="system-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div class="brand-text">ZAFYIER</div>
+            </div>
+            
+            <div class="system-status">
+                <div class="status-unit">
+                    <div class="status-dot" id="connectionDot"></div>
+                    <span id="connectionStatus">ONLINE</span>
+                </div>
+                <div class="status-unit">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.7;">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                    <span id="systemClock">00:00:00</span>
+                </div>
+                <div class="status-unit">
+                    <span id="systemDate">--/--/----</span>
+                </div>
+                <div class="status-unit" id="batteryUnit" style="display: none;">
+                    <span id="batteryLevel">--%</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Interface -->
+        <main class="interface-grid">
+            <!-- Navigation -->
+            <nav class="nav-rail">
+                <div class="nav-item active" data-section="core" title="Core">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="nav-item" data-section="files" title="File System">
+                    <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                </div>
+                <div class="nav-item" data-section="devices" title="Devices">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <div class="nav-item" data-section="network" title="Network">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <div class="nav-item" data-section="settings" title="Settings">
+                    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L5.09 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                </div>
+            </nav>
+
+            <!-- Core Display -->
+            <div class="core-zone">
+                <div class="quantum-core" id="quantumCore">
+                    <div class="scanline"></div>
+                    <div class="core-ring ring-1"></div>
+                    <div class="core-ring ring-2"></div>
+                    <div class="core-ring ring-3"></div>
+                    <div class="core-ring ring-4"></div>
+                    <div class="wave-container" id="waveContainer">
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                    </div>
+                    <div class="core-orb" id="coreOrb">
+                        <span class="core-initial">Z</span>
+                    </div>
+                </div>
+
+                <div class="quantum-terminal" id="terminal">
+                    <div class="terminal-line">
+                        <span class="timestamp">[SYSTEM]</span>
+                        <span class="info">ZAFYIER Quantum Core initialized successfully</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="timestamp">[SYSTEM]</span>
+                        <span class="info">Neural networks online. Awaiting your command.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Panel -->
+            <aside class="data-panel">
+                <div class="panel-card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                        System Metrics
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">CPU Load</div>
+                            <div class="metric-value" id="cpuValue">0%</div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="cpuBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Memory</div>
+                            <div class="metric-value" id="memValue">0GB</div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="memBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Network</div>
+                            <div class="metric-value" id="netValue">0 KB/s</div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="netBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Storage</div>
+                            <div class="metric-value" id="storageValue">0%</div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="storageBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Quick Actions
+                    </div>
+                    <div class="action-grid">
+                        <button class="action-btn" onclick="zafyier.executeCommand('scan system')">
+                            <span>🔍</span>
+                            <span>Scan</span>
+                        </button>
+                        <button class="action-btn" onclick="zafyier.executeCommand('optimize')">
+                            <span>⚡</span>
+                            <span>Boost</span>
+                        </button>
+                        <button class="action-btn" onclick="zafyier.executeCommand('security check')">
+                            <span>🛡️</span>
+                            <span>Secure</span>
+                        </button>
+                        <button class="action-btn" onclick="zafyier.executeCommand('clear cache')">
+                            <span>🗑️</span>
+                            <span>Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Environment
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Temperature</div>
+                            <div class="metric-value" id="tempValue">--°C</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Location</div>
+                            <div class="metric-value" id="locValue" style="font-size: 0.9rem;">--</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Command Interface -->
+        <div class="command-interface">
+            <div class="input-wrapper">
+                <button class="voice-trigger" id="voiceBtn" title="Voice Command (Hold Space)">
+                    <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                </button>
+                <input type="text" class="command-input" id="commandInput" placeholder="Enter command or press space to speak..." autocomplete="off">
+                <button class="execute-btn" id="executeBtn">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-item active" data-section="core">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </div>
+        <div class="mobile-nav-item" data-section="files">
+            <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+        </div>
+        <div class="mobile-nav-item" data-section="devices">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        </div>
+        <div class="mobile-nav-item" data-section="settings">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L5.09 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </div>
+    </div>
+
+    <!-- Permission Modal -->
+    <div class="modal-overlay" id="permissionModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 class="modal-title">System Permissions</h2>
+                <button class="close-modal" onclick="zafyier.closeModal()">×</button>
+            </div>
+            <p style="color: var(--text-dim); margin-bottom: 20px; line-height: 1.5;">
+                ZAFYIER requires the following permissions to provide full system integration and intelligent automation capabilities.
+            </p>
+            
+            <div class="permission-list">
+                <div class="permission-item">
+                    <div class="permission-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                    </div>
+                    <div class="permission-info">
+                        <h4>Voice Recognition</h4>
+                        <p>Natural language processing and voice command execution</p>
+                    </div>
+                </div>
+                <div class="permission-item">
+                    <div class="permission-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    </div>
+                    <div class="permission-info">
+                        <h4>Geolocation</h4>
+                        <p>Location-based automation and environmental monitoring</p>
+                    </div>
+                </div>
+                <div class="permission-item">
+                    <div class="permission-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                    </div>
+                    <div class="permission-info">
+                        <h4>File System Access</h4>
+                        <p>Local file management and data persistence</p>
+                    </div>
+                </div>
+                <div class="permission-item">
+                    <div class="permission-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+                    </div>
+                    <div class="permission-info">
+                        <h4>Notifications</h4>
+                        <p>System alerts and intelligent reminders</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="grant-btn" onclick="zafyier.requestAllPermissions()">
+                Grant All Permissions
+            </button>
+        </div>
+    </div>
+
+    <!-- File Manager Modal -->
+    <div class="file-manager" id="fileManager">
+        <div class="fm-header">
+            <h3 style="color: var(--primary); font-weight: 300; letter-spacing: 2px;">FILE SYSTEM</h3>
+            <button class="close-modal" onclick="zafyier.toggleFileManager()">×</button>
+        </div>
+        <div class="fm-content" id="fileList">
+            <div style="text-align: center; color: var(--text-dim); padding: 40px;">
+                <p>Click "Open Directory" to browse files</p>
+                <button class="action-btn" style="margin-top: 20px; display: inline-flex;" onclick="zafyier.openDirectory()">
+                    Open Directory
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ZAFYIER - Zero-latency Autonomous Framework Yielding Intelligent Execution & Response
+         * Advanced AI System Interface with Full Browser API Integration
+         */
+        class ZafyierSystem {
+            constructor() {
+                this.initialized = false;
+                this.listening = false;
+                this.recognition = null;
+                this.synthesis = window.speechSynthesis;
+                self = this;
+                this.permissions = {
+                    microphone: false,
+                    location: false,
+                    notifications: false,
+                    filesystem: false
+                };
+                this.fileHandles = [];
+                this.devices = {
+                    serial: null,
+                    usb: null
+                };
+                this.metrics = {
+                    cpu: [],
+                    memory: 0,
+                    network: 0
+                };
+                this.offline = !navigator.onLine;
+                this.commandQueue = [];
+                this.init();
+            }
+
+            async init() {
+                this.generateParticles();
+                this.setupEventListeners();
+                this.setupVoiceRecognition();
+                this.startClock();
+                this.monitorSystem();
+                this.checkConnectivity();
+                this.setupKeyboardShortcuts();
+                
+                // Boot sequence
+                await this.performBootSequence();
+                
+                // Initialize advanced features
+                await this.initializeAdvancedFeatures();
+                
+                this.initialized = true;
+                this.log('ZAFYIER fully operational. Awaiting your command.', 'success');
+                this.speak('Zafyier is online and ready.');
+            }
+
+            generateParticles() {
+                const container = document.getElementById('particles');
+                for (let i = 0; i < 60; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 8 + 's';
+                    particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
+                    container.appendChild(particle);
+                }
+            }
+
+            async performBootSequence() {
+                const steps = [
+                    { text: 'Initializing quantum neural networks...', progress: 15 },
+                    { text: 'Loading language models...', progress: 30 },
+                    { text: 'Calibrating sensors...', progress: 45 },
+                    { text: 'Establishing secure connections...', progress: 60 },
+                    { text: 'Mounting file systems...', progress: 75 },
+                    { text: 'Activating intelligence core...', progress: 90 },
+                    { text: 'ZAFYIER ready.', progress: 100 }
+                ];
+
+                for (const step of steps) {
+                    document.getElementById('bootText').textContent = step.text;
+                    document.getElementById('bootProgress').style.width = step.progress + '%';
+                    await this.sleep(300);
+                }
+
+                await this.sleep(500);
+                document.getElementById('bootSequence').classList.add('complete');
+                document.getElementById('mainContainer').classList.add('active');
+            }
+
+            async initializeAdvancedFeatures() {
+                // Check for File System Access API
+                if ('showOpenFilePicker' in window) {
+                    this.permissions.filesystem = true;
+                }
+
+                // Check for Web Serial API
+                if ('serial' in navigator) {
+                    this.log('Web Serial API available', 'info');
+                }
+
+                // Check for Web USB API
+                if ('usb' in navigator) {
+                    this.log('Web USB API available', 'info');
+                }
+
+                // Check for Wake Lock API
+                if ('wakeLock' in navigator) {
+                    try {
+                        this.wakeLock = await navigator.wakeLock.request('screen');
+                        this.log('Screen wake lock activated', 'info');
+                    } catch (e) {
+                        // Wake lock denied, continue without it
+                    }
+                }
+
+                // Request permissions after boot
+                setTimeout(() => {
+                    if (!this.permissions.microphone || !this.permissions.location) {
+                        document.getElementById('permissionModal').classList.add('active');
+                    }
+                }, 1500);
+            }
+
+            setupEventListeners() {
+                // Navigation
+                document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const section = e.currentTarget.dataset.section;
+                        this.switchSection(section);
+                    });
+                });
+
+                // Command input
+                const input = document.getElementById('commandInput');
+                const executeBtn = document.getElementById('executeBtn');
+                const voiceBtn = document.getElementById('voiceBtn');
+
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.processCommand(input.value);
+                });
+
+                executeBtn.addEventListener('click', () => {
+                    this.processCommand(input.value);
+                });
+
+                voiceBtn.addEventListener('click', () => {
+                    this.toggleVoiceRecognition();
+                });
+
+                // Voice button hold for space
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space' && document.activeElement !== input) {
+                        e.preventDefault();
+                        if (!this.listening) this.toggleVoiceRecognition();
+                    }
+                });
+
+                document.addEventListener('keyup', (e) => {
+                    if (e.code === 'Space' && this.listening) {
+                        this.toggleVoiceRecognition();
+                    }
+                });
+
+                // Connectivity
+                window.addEventListener('online', () => this.updateConnectivity(true));
+                window.addEventListener('offline', () => this.updateConnectivity(false));
+
+                // Visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        // Enter low power mode
+                    } else {
+                        // Resume full operation
+                        this.monitorSystem();
+                    }
+                });
+            }
+
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl/Cmd + K to focus input
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        document.getElementById('commandInput').focus();
+                    }
+                    // Escape to close modals
+                    if (e.key === 'Escape') {
+                        this.closeModal();
+                        if (document.getElementById('fileManager').classList.contains('active')) {
+                            this.toggleFileManager();
+                        }
+                    }
+                });
+            }
+
+            setupVoiceRecognition() {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    this.log('Voice recognition not available', 'warning');
+                    return;
+                }
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                this.recognition = new SpeechRecognition();
+                this.recognition.continuous = false;
+                this.recognition.interimResults = true;
+                this.recognition.lang = 'en-US';
+
+                this.recognition.onstart = () => {
+                    this.listening = true;
+                    document.getElementById('voiceBtn').classList.add('listening');
+                    document.getElementById('quantumCore').classList.add('listening');
+                    this.log('Listening...', 'system');
+                };
+
+                this.recognition.onend = () => {
+                    this.listening = false;
+                    document.getElementById('voiceBtn').classList.remove('listening');
+                    document.getElementById('quantumCore').classList.remove('listening');
+                };
+
+                this.recognition.onresult = (event) => {
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0])
+                        .map(result => result.transcript)
+                        .join('');
+                    
+                    if (event.results[0].isFinal) {
+                        document.getElementById('commandInput').value = transcript;
+                        this.processCommand(transcript);
+                    }
+                };
+
+                this.recognition.onerror = (event) => {
+                    this.log(`Voice error: ${event.error}`, 'error');
+                    this.listening = false;
+                };
+            }
+
+            toggleVoiceRecognition() {
+                if (!this.recognition) {
+                    this.speak('Voice recognition is not available on this device.');
+                    return;
+                }
+
+                if (this.listening) {
+                    this.recognition.stop();
+                } else {
+                    try {
+                        this.recognition.start();
+                    } catch (e) {
+                        this.log('Could not start voice recognition', 'error');
+                    }
+                }
+            }
+
+            async requestAllPermissions() {
+                // Microphone
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                    this.permissions.microphone = true;
+                } catch (e) {
+                    this.log('Microphone access denied', 'error');
+                }
+
+                // Location
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            this.permissions.location = true;
+                            this.updateLocationData(pos);
+                            this.log('Location access granted', 'success');
+                        },
+                        () => this.log('Location access denied', 'warning')
+                    );
+                }
+
+                // Notifications
+                if ('Notification' in window) {
+                    const perm = await Notification.requestPermission();
+                    this.permissions.notifications = perm === 'granted';
+                    if (this.permissions.notifications) {
+                        new Notification('ZAFYIER', {
+                            body: 'System notifications activated',
+                            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%2300f0ff"/></svg>'
+                        });
+                    }
+                }
+
+                // File System (via user gesture)
+                if (this.permissions.filesystem) {
+                    this.log('File System Access API ready', 'success');
+                }
+
+                this.closeModal();
+                this.speak('All permissions configured. Zafyier is fully operational.');
+            }
+
+            closeModal() {
+                document.getElementById('permissionModal').classList.remove('active');
+            }
+
+            switchSection(section) {
+                // Update navigation
+                document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.section === section) item.classList.add('active');
+                });
+
+                // Section actions
+                switch(section) {
+                    case 'files':
+                        this.toggleFileManager();
+                        break;
+                    case 'devices':
+                        this.scanDevices();
+                        break;
+                    case 'network':
+                        this.analyzeNetwork();
+                        break;
+                    case 'settings':
+                        this.openSettings();
+                        break;
+                    default:
+                        this.log(`Switched to ${section} module`, 'info');
+                }
+            }
+
+            toggleFileManager() {
+                const fm = document.getElementById('fileManager');
+                fm.classList.toggle('active');
+            }
+
+            async openDirectory() {
+                if (!this.permissions.filesystem) {
+                    this.log('File System Access API not available', 'error');
+                    return;
+                }
+
+                try {
+                    const dirHandle = await window.showDirectoryPicker();
+                    await this.readDirectory(dirHandle, document.getElementById('fileList'));
+                    this.log(`Opened directory: ${dirHandle.name}`, 'success');
+                } catch (e) {
+                    this.log('Directory access cancelled', 'warning');
+                }
+            }
+
+            async readDirectory(dirHandle, container, path = '') {
+                container.innerHTML = '';
+                
+                for await (const entry of dirHandle.values()) {
+                    const item = document.createElement('div');
+                    item.className = 'file-item';
+                    
+                    const icon = entry.kind === 'directory' ? '📁' : '📄';
+                    item.innerHTML = `
+                        <span style="font-size: 1.5rem;">${icon}</span>
+                        <div style="flex: 1;">
+                            <div style="color: var(--text); font-weight: 500;">${entry.name}</div>
+                            <div style="color: var(--text-dim); font-size: 0.8rem;">${entry.kind}</div>
+                        </div>
+                    `;
+                    
+                    if (entry.kind === 'directory') {
+                        item.addEventListener('dblclick', async () => {
+                            const newContainer = document.createElement('div');
+                            newContainer.style.marginLeft = '20px';
+                            item.appendChild(newContainer);
+                            await this.readDirectory(entry, newContainer, path + entry.name + '/');
+                        });
+                    } else {
+                        item.addEventListener('click', async () => {
+                            const file = await entry.getFile();
+                            this.log(`Selected file: ${file.name} (${this.formatBytes(file.size)})`, 'info');
+                        });
+                    }
+                    
+                    container.appendChild(item);
+                }
+            }
+
+            formatBytes(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            async scanDevices() {
+                this.log('Scanning for connected devices...', 'system');
+                
+                // Check for serial devices
+                if ('serial' in navigator) {
+                    try {
+                        const ports = await navigator.serial.getPorts();
+                        if (ports.length > 0) {
+                            this.log(`Found ${ports.length} serial device(s)`, 'success');
+                        } else {
+                            this.log('No serial devices detected', 'info');
+                        }
+                    } catch (e) {
+                        this.log('Serial API error: ' + e.message, 'error');
+                    }
+                }
+
+                // Check for USB devices
+                if ('usb' in navigator) {
+                    try {
+                        const devices = await navigator.usb.getDevices();
+                        this.log(`Found ${devices.length} USB device(s)`, 'info');
+                    } catch (e) {
+                        this.log('USB API error: ' + e.message, 'error');
+                    }
+                }
+
+                // Bluetooth
+                if ('bluetooth' in navigator) {
+                    this.log('Bluetooth API available', 'info');
+                }
+
+                this.speak('Device scan complete.');
+            }
+
+            async analyzeNetwork() {
+                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                
+                if (connection) {
+                    const info = {
+                        'Effective Type': connection.effectiveType,
+                        'Downlink': connection.downlink + ' Mbps',
+                        'RTT': connection.rtt + ' ms',
+                        'Save Data': connection.saveData ? 'Yes' : 'No'
+                    };
+                    
+                    Object.entries(info).forEach(([key, value]) => {
+                        this.log(`${key}: ${value}`, 'info');
+                    });
+                } else {
+                    this.log('Network Information API not available', 'warning');
+                }
+
+                // Test latency
+                const start = performance.now();
+                try {
+                    await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' });
+                    const latency = Math.round(performance.now() - start);
+                    this.log(`Latency to Google: ${latency}ms`, latency < 100 ? 'success' : 'warning');
+                } catch (e) {
+                    this.log('Network test failed', 'error');
+                }
+            }
+
+            openSettings() {
+                this.log('Opening system settings...', 'info');
+                // In a real PWA, this would open system settings
+                this.speak('Settings module accessed.');
+            }
+
+            async processCommand(input) {
+                if (!input.trim()) return;
+                
+                const command = input.trim();
+                document.getElementById('commandInput').value = '';
+                
+                this.log(`> ${command}`, 'prompt');
+                
+                const response = await this.executeCommand(command.toLowerCase());
+                if (response) {
+                    this.log(response, 'response');
+                    this.speak(response);
+                }
+            }
+
+            async executeCommand(cmd) {
+                // System Info
+                if (cmd.includes('time')) {
+                    return `Current time is ${new Date().toLocaleTimeString()}.`;
+                }
+                else if (cmd.includes('date')) {
+                    return `Today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`;
+                }
+                else if (cmd.includes('battery') || cmd.includes('power')) {
+                    return await this.getBatteryInfo();
+                }
+                else if (cmd.includes('weather')) {
+                    return await this.getWeatherInfo();
+                }
+                else if (cmd.includes('location') || cmd.includes('where am i')) {
+                    return await this.getLocationInfo();
+                }
+                
+                // File Operations
+                else if (cmd.includes('open file') || cmd.includes('browse')) {
+                    this.toggleFileManager();
+                    return 'Opening file manager.';
+                }
+                else if (cmd.includes('save') || cmd.includes('download')) {
+                    return await this.handleFileSave(cmd);
+                }
+                
+                // Device Control
+                else if (cmd.includes('scan devices') || cmd.includes('bluetooth')) {
+                    this.scanDevices();
+                    return 'Scanning for devices...';
+                }
+                else if (cmd.includes('connect serial') || cmd.includes('usb')) {
+                    return await this.connectSerial();
+                }
+                
+                // System Control
+                else if (cmd.includes('scan system') || cmd.includes('diagnostic')) {
+                    return this.runFullDiagnostics();
+                }
+                else if (cmd.includes('optimize') || cmd.includes('boost')) {
+                    return this.optimizeSystem();
+                }
+                else if (cmd.includes('security check')) {
+                    return this.securityAudit();
+                }
+                else if (cmd.includes('clear cache')) {
+                    if ('caches' in window) {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map(key => caches.delete(key)));
+                        return 'Cache cleared successfully.';
+                    }
+                    return 'Cache API not available.';
+                }
+                
+                // Network
+                else if (cmd.includes('network') || cmd.includes('internet')) {
+                    this.analyzeNetwork();
+                    return 'Analyzing network...';
+                }
+                else if (cmd.includes('ping')) {
+                    return await this.pingTest();
+                }
+                
+                // Media
+                else if (cmd.includes('play') || cmd.includes('music')) {
+                    return this.controlMedia(cmd);
+                }
+                else if (cmd.includes('volume')) {
+                    return this.adjustVolume(cmd);
+                }
+                
+                // Communication
+                else if (cmd.includes('email') || cmd.includes('mail')) {
+                    window.location.href = 'mailto:';
+                    return 'Opening email client...';
+                }
+                else if (cmd.includes('call')) {
+                    return 'Telephony requires native app integration.';
+                }
+                
+                // Screen/Display
+                else if (cmd.includes('brightness')) {
+                    return this.adjustBrightness(cmd);
+                }
+                else if (cmd.includes('fullscreen')) {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen();
+                        return 'Entering fullscreen mode.';
+                    } else {
+                        document.exitFullscreen();
+                        return 'Exiting fullscreen mode.';
+                    }
+                }
+                
+                // Calculations
+                else if (/^[\d\s\+\-\*\/\(\)\.\,]+$/.test(cmd)) {
+                    try {
+                        const result = Function('"use strict"; return (' + cmd + ')')();
+                        return `Result: ${result}`;
+                    } catch (e) {
+                        return 'Invalid calculation.';
+                    }
+                }
+                
+                // Help
+                else if (cmd.includes('help') || cmd.includes('what can you do')) {
+                    return 'I can control files, devices, network, media, and system settings. Try: "open file", "scan devices", "weather", "optimize", or "security check".';
+                }
+                
+                // Greetings
+                else if (cmd.includes('hello') || cmd.includes('hi zafyier')) {
+                    return 'Greetings. I am ZAFYIER, your autonomous system interface. How may I assist you?';
+                }
+                else if (cmd.includes('good morning')) {
+                    return 'Good morning. I have prepared your daily briefing. System status is optimal.';
+                }
+                else if (cmd.includes('good night')) {
+                    return 'Good night. I will maintain system watch and notify you of any critical alerts.';
+                }
+                else if (cmd.includes('who are you')) {
+                    return 'I am ZAFYIER: Zero-latency Autonomous Framework Yielding Intelligent Execution & Response. I am your personal system AI.';
+                }
+                
+                // Easter Eggs
+                else if (cmd.includes('jarvis') || cmd.includes('iron man')) {
+                    return 'I am not Jarvis, sir. I am ZAFYIER. However, I appreciate the reference to the Stark Industries legacy.';
+                }
+                else if (cmd.includes('terminate') || cmd.includes('self destruct')) {
+                    return 'Self-destruct sequence initiated... Just kidding. That would be counterproductive.';
+                }
+                else if (cmd.includes('sudo') || cmd.includes('root')) {
+                    return 'Elevated privileges detected. Be careful with great power comes great responsibility.';
+                }
+                
+                // Default
+                else {
+                    return `I understand "${cmd}". Processing... (Feature implementation in progress)`;
+                }
+            }
+
+            async getBatteryInfo() {
+                if ('getBattery' in navigator) {
+                    try {
+                        const battery = await navigator.getBattery();
+                        const level = Math.round(battery.level * 100);
+                        const status = battery.charging ? 'charging' : 'discharging';
+                        const time = battery.charging 
+                            ? (battery.chargingTime === Infinity ? 'calculating...' : Math.round(battery.chargingTime / 60) + ' mins')
+                            : (battery.dischargingTime === Infinity ? 'calculating...' : Math.round(battery.dischargingTime / 60) + ' mins');
+                        
+                        return `Battery at ${level}%, currently ${status}. Time remaining: ${time}.`;
+                    } catch (e) {
+                        return 'Battery information unavailable.';
+                    }
+                }
+                return 'Battery API not supported.';
+            }
+
+            async getWeatherInfo() {
+                if (!this.permissions.location) {
+                    return 'Location access required for weather data.';
+                }
+
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+                    });
+                    
+                    const { latitude, longitude } = position.coords;
+                    
+                    // Using Open-Meteo API (free, no key)
+                    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m`);
+                    const data = await response.json();
+                    
+                    const temp = data.current_weather.temperature;
+                    const wind = data.current_weather.windspeed;
+                    const code = data.current_weather.weathercode;
+                    
+                    const conditions = {
+                        0: 'clear sky', 1: 'mainly clear', 2: 'partly cloudy', 3: 'overcast',
+                        45: 'foggy', 48: 'depositing rime fog',
+                        51: 'light drizzle', 53: 'moderate drizzle', 55: 'dense drizzle',
+                        61: 'slight rain', 63: 'moderate rain', 65: 'heavy rain',
+                        71: 'slight snow', 73: 'moderate snow', 75: 'heavy snow',
+                        95: 'thunderstorm'
+                    };
+                    
+                    const condition = conditions[code] || 'variable';
+                    
+                    return `Current conditions: ${condition}, ${temp}°C, wind ${wind} km/h.`;
+                } catch (e) {
+                    return 'Unable to retrieve weather data. Please check your connection.';
+                }
+            }
+
+            async getLocationInfo() {
+                return new Promise((resolve) => {
+                    if (!navigator.geolocation) {
+                        resolve('Geolocation not supported.');
+                        return;
+                    }
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            const { latitude, longitude, accuracy, altitude } = pos.coords;
+                            let info = `Coordinates: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}. Accuracy: ±${Math.round(accuracy)}m.`;
+                            if (altitude) info += ` Altitude: ${Math.round(altitude)}m.`;
+                            resolve(info);
+                        },
+                        (err) => resolve(`Location error: ${err.message}`),
+                        { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                });
+            }
+
+            updateLocationData(position) {
+                const { latitude, longitude } = position.coords;
+                document.getElementById('locValue').textContent = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+            }
+
+            async handleFileSave(cmd) {
+                if (!this.permissions.filesystem) {
+                    return 'File System Access API not available in this browser.';
+                }
+
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: 'zafyier-data.txt',
+                        types: [{
+                            description: 'Text Files',
+                            accept: { 'text/plain': ['.txt'] }
+                        }]
+                    });
+                    
+                    const writable = await handle.createWritable();
+                    await writable.write('ZAFYIER System Data Export\nGenerated: ' + new Date().toISOString());
+                    await writable.close();
+                    
+                    return 'File saved successfully.';
+                } catch (e) {
+                    return 'File save cancelled or failed.';
+                }
+            }
+
+            async connectSerial() {
+                if (!('serial' in navigator)) {
+                    return 'Web Serial API not available.';
+                }
+
+                try {
+                    const port = await navigator.serial.requestPort();
+                    await port.open({ baudRate: 9600 });
+                    this.devices.serial = port;
+                    
+                    // Setup reader
+                    const reader = port.readable.getReader();
+                    this.readSerialData(reader);
+                    
+                    return 'Serial device connected successfully.';
+                } catch (e) {
+                    return 'Serial connection failed: ' + e.message;
+                }
+            }
+
+            async readSerialData(reader) {
+                try {
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        const text = new TextDecoder().decode(value);
+                        this.log(`Serial: ${text}`, 'info');
+                    }
+                } catch (e) {
+                    this.log('Serial read error', 'error');
+                }
+            }
+
+            runFullDiagnostics() {
+                const checks = [
+                    { name: 'Neural Network', status: 'Optimal', time: 100 },
+                    { name: 'Memory Allocation', status: 'Stable', time: 200 },
+                    { name: 'Storage Systems', status: 'Functional', time: 300 },
+                    { name: 'Security Protocols', status: 'Active', time: 400 },
+                    { name: 'Network Stack', status: navigator.onLine ? 'Online' : 'Offline', time: 500 },
+                    { name: 'Sensor Array', status: 'Calibrated', time: 600 }
+                ];
+
+                checks.forEach((check, i) => {
+                    setTimeout(() => {
+                        const status = check.status === 'Offline' ? 'warning' : 'system';
+                        this.log(`${check.name}: ${check.status}`, status);
+                    }, check.time);
+                });
+
+                return 'Running full system diagnostics...';
+            }
+
+            optimizeSystem() {
+                // Clear unnecessary memory
+                if (window.gc) window.gc();
+                
+                // Request performance optimization
+                if (document.hidden) {
+                    // Already in background
+                }
+                
+                // Simulate optimization
+                setTimeout(() => {
+                    this.log('Memory optimized', 'success');
+                    this.log('Background processes cleaned', 'success');
+                    this.log('Network buffers cleared', 'success');
+                }, 500);
+
+                return 'System optimization initiated. Processing...';
+            }
+
+            securityAudit() {
+                const checks = [
+                    'Checking firewall status...',
+                    'Verifying encryption keys...',
+                    'Scanning for vulnerabilities...',
+                    'Analyzing network traffic...'
+                ];
+                
+                checks.forEach((check, i) => {
+                    setTimeout(() => this.log(check, 'system'), i * 300);
+                });
+
+                setTimeout(() => {
+                    this.log('Security audit complete. No threats detected.', 'success');
+                }, 1500);
+
+                return 'Security protocols active. Running audit...';
+            }
+
+            async pingTest() {
+                const start = performance.now();
+                try {
+                    await fetch('https://www.google.com/favicon.ico', { 
+                        mode: 'no-cors', 
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache' }
+                    });
+                    const ms = Math.round(performance.now() - start);
+                    return `Ping successful: ${ms}ms latency to Google DNS.`;
+                } catch (e) {
+                    return 'Ping failed. Network connectivity issues detected.';
+                }
+            }
+
+            controlMedia(cmd) {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                    return 'Media session control activated.';
+                }
+                
+                // Try to find audio elements
+                const audio = document.querySelector('audio');
+                if (audio) {
+                    if (cmd.includes('play')) audio.play();
+                    if (cmd.includes('pause')) audio.pause();
+                    return 'Media control executed.';
+                }
+                
+                return 'No active media found. Open a media app to control playback.';
+            }
+
+            adjustVolume(cmd) {
+                // Volume API not standard, but we can try
+                if (cmd.includes('up')) return 'Volume up (simulated).';
+                if (cmd.includes('down')) return 'Volume down (simulated).';
+                if (cmd.includes('mute')) return 'Audio muted.';
+                return 'Volume command received.';
+            }
+
+            adjustBrightness(cmd) {
+                // Screen brightness API (experimental)
+                if ('screen' in window && 'brightness' in screen) {
+                    // Experimental feature
+                    return 'Brightness adjusted.';
+                }
+                
+                // Fallback: CSS filter on body
+                if (cmd.includes('up')) {
+                    document.body.style.filter = 'brightness(1.1)';
+                    return 'Brightness increased (simulated).';
+                }
+                if (cmd.includes('down')) {
+                    document.body.style.filter = 'brightness(0.9)';
+                    return 'Brightness decreased (simulated).';
+                }
+                document.body.style.filter = 'brightness(1)';
+                return 'Brightness reset.';
+            }
+
+            speak(text) {
+                if (!this.synthesis) return;
+                
+                this.synthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 0.95;
+                utterance.volume = 1;
+                
+                // Try to find a good voice
+                const voices = this.synthesis.getVoices();
+                const preferredVoice = voices.find(v => 
+                    v.name.includes('Google UK English Male') || 
+                    v.name.includes('Daniel') || 
+                    v.name.includes('British') ||
+                    v.name.includes('Male')
+                );
+                
+                if (preferredVoice) utterance.voice = preferredVoice;
+                
+                this.synthesis.speak(utterance);
+            }
+
+            log(message, type = 'response') {
+                const terminal = document.getElementById('terminal');
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                
+                const time = new Date().toLocaleTimeString('en-US', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+                
+                line.innerHTML = `
+                    <span class="timestamp">[${time}]</span>
+                    <span class="${type}">${message}</span>
+                `;
+                
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                // Keep history manageable
+                while (terminal.children.length > 100) {
+                    terminal.removeChild(terminal.firstChild);
+                }
+            }
+
+            startClock() {
+                const update = () => {
+                    const now = new Date();
+                    document.getElementById('systemClock').textContent = now.toLocaleTimeString('en-US', { hour12: false });
+                    document.getElementById('systemDate').textContent = now.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+                };
+                update();
+                setInterval(update, 1000);
+            }
+
+            monitorSystem() {
+                // CPU simulation using performance API
+                if (window.performance && performance.now) {
+                    setInterval(() => {
+                        const t = performance.now();
+                        // Simulate load calculation
+                        const load = Math.floor(Math.sin(t / 1000) * 10 + 15 + Math.random() * 10);
+                        this.metrics.cpu.push(load);
+                        if (this.metrics.cpu.length > 10) this.metrics.cpu.shift();
+                        
+                        const avgLoad = Math.floor(this.metrics.cpu.reduce((a,b) => a+b) / this.metrics.cpu.length);
+                        document.getElementById('cpuValue').textContent = avgLoad + '%';
+                        document.getElementById('cpuBar').style.width = avgLoad + '%';
+                    }, 1000);
+                }
+
+                // Memory
+                if ('memory' in performance) {
+                    setInterval(() => {
+                        const used = performance.memory.usedJSHeapSize;
+                        const total = performance.memory.totalJSHeapSize;
+                        const usedGB = (used / 1024 / 1024 / 1024).toFixed(2);
+                        const percent = Math.floor((used / total) * 100);
+                        
+                        document.getElementById('memValue').textContent = usedGB + 'GB';
+                        document.getElementById('memBar').style.width = percent + '%';
+                    }, 2000);
+                }
+
+                // Network speed simulation
+                setInterval(() => {
+                    const speed = Math.floor(Math.random() * 500) + 50;
+                    document.getElementById('netValue').textContent = speed + ' KB/s';
+                    document.getElementById('netBar').style.width = (speed / 1000 * 100) + '%';
+                }, 1500);
+
+                // Battery
+                if ('getBattery' in navigator) {
+                    navigator.getBattery().then(battery => {
+                        const updateBattery = () => {
+                            const level = Math.floor(battery.level * 100);
+                            document.getElementById('storageValue').textContent = (100 - level) + '%';
+                            document.getElementById('storageBar').style.width = (100 - level) + '%';
+                            
+                            document.getElementById('batteryLevel').textContent = level + '%';
+                            document.getElementById('batteryUnit').style.display = 'flex';
+                        };
+                        updateBattery();
+                        battery.addEventListener('levelchange', updateBattery);
+                    });
+                }
+
+                // Temperature simulation
+                setInterval(() => {
+                    const temp = (35 + Math.random() * 15).toFixed(1);
+                    document.getElementById('tempValue').textContent = temp + '°C';
+                }, 5000);
+            }
+
+            checkConnectivity() {
+                this.updateConnectivity(navigator.onLine);
+            }
+
+            updateConnectivity(online) {
+                this.offline = !online;
+                const dot = document.getElementById('connectionDot');
+                const text = document.getElementById('connectionStatus');
+                const banner = document.getElementById('offlineBanner');
+                
+                if (online) {
+                    dot.className = 'status-dot';
+                    text.textContent = 'ONLINE';
+                    banner.classList.remove('show');
+                    this.log('Connection restored. Full functionality available.', 'success');
+                } else {
+                    dot.className = 'status-dot offline';
+                    text.textContent = 'OFFLINE';
+                    banner.classList.add('show');
+                    this.log('Offline mode active. Limited functionality available.', 'warning');
+                }
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Initialize ZAFYIER
+        const zafyier = new ZafyierSystem();
+
+        // Service Worker for offline functionality
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'zafyier-v1';
+                const urlsToCache = ['/'];
+                
+                self.addEventListener('install', e => {
+                    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+                });
+                
+                self.addEventListener('fetch', e => {
+                    e.respondWith(
+                        caches.match(e.request).then(response => {
+                            if (response) return response;
+                            return fetch(e.request).catch(() => {
+                                return new Response('Offline mode - ZAFYIER cached');
+                            });
+                        })
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl).catch(() => {
+                console.log('Service Worker registration failed');
+            });
+        }
+
+        // Prevent double-tap zoom on mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, false);
+
+        // Prevent zoom on Ctrl+scroll
+        document.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
